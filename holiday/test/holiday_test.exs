@@ -1,6 +1,5 @@
 defmodule HolidayTest do
   use ExUnit.Case
-  # doctest Holiday
 
   test "is_holiday/2 with holiday day" do
     db = Holiday.init_db()

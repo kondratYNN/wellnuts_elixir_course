@@ -116,9 +116,3 @@ defmodule Holiday do
     end
   end
 end
-
-db = Holiday.init_db()
-IO.puts(Holiday.is_holiday(db, ~D[2020-12-25]))
-IO.puts(Holiday.is_holiday(db))
-IO.puts(Holiday.time_until_holiday(db, :day))
-IO.puts(Holiday.time_until_holiday(Holiday.init_db(), ~U[2021-12-24 01:00:00Z], :hour))
