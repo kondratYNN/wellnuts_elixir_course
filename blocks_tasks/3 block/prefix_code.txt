@@ -1,0 +1,26 @@
+defmodule Solution do
+  @spec longest_common_prefix(strs :: [String.t]) :: String.t
+  def longest_common_prefix(strs) do
+    if length(strs) == 1 do
+      hd strs
+    else   
+      left_part_s = longest_common_prefix(Enum.slice(strs, 0..div(length(strs), 2) - 1))
+      right_part_s = longest_common_prefix(Enum.slice(strs, div(length(strs), 2) ..length(strs) - 1))
+
+      res = for n <- 0..String.length(left_part_s) - 1 do
+        if String.starts_with?(right_part_s, String.slice(left_part_s, 0..n)) do
+          pref_length = n + 1
+        end
+      end
+      res = Enum.filter(res, fn(x) -> is_integer(x) end)
+      res = Enum.max(res, fn -> 0 end)
+      
+      if res == 0 do
+        ""
+      else
+        String.slice(left_part_s, 0..res - 1)
+      end
+ 
+    end
+  end
+end
