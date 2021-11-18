@@ -8,21 +8,23 @@ defmodule Holidays do
   import Ecto.Query, only: [from: 2]
   @type time_unit() :: :day | :hour | :minute | :second
 
+
   @doc """
   Set database.
 
   """
+  @spec init_db :: :ok
   def init_db() do
     file = File.read!("db\\us-california-nonworkingdays.ics")
     text_data = ICalendar.from_ics(file)
 
-    Enum.reduce(text_data, Holidays.Repo, fn x, acc ->
+    Enum.each(text_data, fn x ->
       date = Date.from_erl!({2021, x.dtstart.month, x.dtstart.day})
       name = x.summary
-      holiday = %Holidays.Day{name: name, h_date: date}
-      # хоть day мне не нужен, но иначе просто не работает
-      {:ok, day} = acc.insert(holiday)
-      acc
+
+      %Holidays.Day{}
+      |> Holidays.Day.changeset(%{name: name, h_date: date})
+      |> Holidays.Repo.insert()
     end)
   end
 
@@ -47,6 +49,11 @@ defmodule Holidays do
     Holidays.Repo.exists?(query)
   end
 
+  defp unit_weight(:seconds), do: 1
+  defp unit_weight(:minute), do: 60
+  defp unit_weight(:hour), do: 3600
+  defp unit_weight(:day), do: 3600 * 24
+
   @doc """
   Returns a float representing a number of `unit`s till closest holiday in the future.
 
@@ -67,7 +74,7 @@ defmodule Holidays do
   def time_until_holiday(now \\ DateTime.utc_now(), unit) do
     date_now = DateTime.to_date(now)
 
-    if is_holiday(date_now) == true do
+    if is_holiday(date_now) do
       0
     else
       query =
@@ -80,14 +87,7 @@ defmodule Holidays do
       date = Holidays.Repo.one(query)
       date = DateTime.new!(date, ~T[00:00:00.000], "Etc/UTC")
 
-      unit_weight =
-        case unit do
-          :seconds -> 1
-          :minute -> 60
-          :hour -> 3600
-          :day -> 3600 * 24
-        end
-
+      unit_weight = unit_weight(unit)
       DateTime.diff(date, now) / unit_weight
     end
   end
