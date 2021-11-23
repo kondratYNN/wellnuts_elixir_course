@@ -1,8 +1,12 @@
 defmodule Solution do
+  defp maybe_slice(0, _left_part_s), do: ""
+                                       
+  defp maybe_slice(res, left_part_s), do: String.slice(left_part_s, 0..res - 1)
+
   @spec longest_common_prefix(strs :: [String.t]) :: String.t
   def longest_common_prefix(strs) do
     if length(strs) == 1 do
-      hd strs
+      hd(strs)
     else   
       left_part_s = longest_common_prefix(Enum.slice(strs, 0..div(length(strs), 2) - 1))
       right_part_s = longest_common_prefix(Enum.slice(strs, div(length(strs), 2) ..length(strs) - 1))
@@ -12,14 +16,10 @@ defmodule Solution do
           pref_length = n + 1
         end
       end
-      res = Enum.filter(res, fn(x) -> is_integer(x) end)
-      res = Enum.max(res, fn -> 0 end)
+      |> Enum.filter(fn(x) -> is_integer(x) end)
+      |> Enum.max(fn -> 0 end)
       
-      if res == 0 do
-        ""
-      else
-        String.slice(left_part_s, 0..res - 1)
-      end
+      maybe_slice(res, left_part_s)
  
     end
   end
