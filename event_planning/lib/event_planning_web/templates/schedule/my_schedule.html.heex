@@ -1,0 +1,21 @@
+<h1>Events</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Repetition</th>
+    </tr>
+  </thead>
+  <tbody id="table">
+  <%= form_for @conn, Routes.schedule_path(@conn, :my_schedule), [as: :page, class: "form-signin"], fn f -> %>
+    <div>
+      <%= select f, :categories_id, @categories %>
+    </div>
+    <%= submit "print", class: "btn btn-lg btn-primary btn-block" %>
+  <% end %>
+  </tbody>
+</table>
+
+
+<span><%= link "New Event", to: Routes.schedule_path(@conn, :new) %></span>
+<p><%= link "Next Event", to: Routes.schedule_path(@conn, :next_event) %></p>

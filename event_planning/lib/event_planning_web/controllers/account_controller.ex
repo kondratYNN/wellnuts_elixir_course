@@ -4,7 +4,7 @@ defmodule EventPlanningWeb.AccountController do
   def index(conn, %{"fpasscode" => passcode}) do
     if passcode == "12345" do
       conn = put_session(conn, :message, "hmmm")
-      redirect(conn, to: "/account/inner")
+      redirect(conn, to: "/account/my_sheldue")
     else
       render(conn, "index.html")
     end

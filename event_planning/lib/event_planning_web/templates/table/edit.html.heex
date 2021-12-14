@@ -1,0 +1,5 @@
+<h1>Edit Event</h1>
+
+<span><%= link "Back", to: Routes.table_path(@conn, :show, @event) %></span>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.table_path(@conn, :update, @event)) %>
