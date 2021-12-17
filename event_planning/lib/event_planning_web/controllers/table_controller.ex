@@ -18,6 +18,9 @@ defmodule EventPlanningWeb.TableController do
     event = EventPlanning.Repo.all(q)
 
     event =
+      Enum.reject(event, fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
+
+    event =
       Enum.map(event, fn x ->
         %{
           x
@@ -57,14 +60,15 @@ defmodule EventPlanningWeb.TableController do
   defp date_boundaries(events, categories_id) when categories_id == "month" do
     date_now = DateTime.now!("Etc/UTC")
 
-    date_end = DateTime.add(
-          date_now,
-          86400 *
-            Calendar.ISO.days_in_month(
-              DateTime.to_date(date_now).year,
-              DateTime.to_date(date_now).month
-            )
-        )
+    date_end =
+      DateTime.add(
+        date_now,
+        86400 *
+          Calendar.ISO.days_in_month(
+            DateTime.to_date(date_now).year,
+            DateTime.to_date(date_now).month
+          )
+      )
 
     Enum.reject(events, fn x ->
       DateTime.diff(DateTime.from_naive!(x.date, "Etc/UTC"), date_end) > 0
@@ -214,6 +218,9 @@ defmodule EventPlanningWeb.TableController do
   def next_event(conn, _params) do
     q = Ecto.Query.from(e in EventPlanning.Event)
     events = EventPlanning.Repo.all(q)
+
+    events =
+      Enum.reject(events, fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
 
     events =
       Enum.map(events, fn x ->
