@@ -8,8 +8,12 @@ defmodule EventPlanningWeb.Endpoint do
     store: :cookie,
     key: "_event_planning_key",
     signing_salt: "gzc6mdGX",
-    max_age: 2*60*60
+    max_age: 2 * 60 * 60
   ]
+
+  socket "/socket", EventPlanningWeb.UserSocket,
+    websocket: true,
+    longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 

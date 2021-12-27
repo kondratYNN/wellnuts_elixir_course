@@ -7,5 +7,5 @@
   <%= text_input f, :repetition, id: "repetition" %>
   <%= error_tag f, :repetition %>
 
-  <%= submit "Save", id: "update"%>
+  <%= submit "Save", id: "create_event"%>
 <% end %>

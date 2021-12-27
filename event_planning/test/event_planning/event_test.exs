@@ -30,5 +30,4 @@ defmodule EventPlanning.EventTest do
 
     assert %{} = errors_on(changeset)
   end
-
 end

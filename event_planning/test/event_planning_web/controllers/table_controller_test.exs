@@ -9,6 +9,7 @@ defmodule EventPlanningWeb.TableControllerTest do
       %EventPlanning.Event{}
       |> EventPlanning.Event.changeset(@valid_attrs)
       |> EventPlanning.Repo.insert()
+
     event
   end
 
@@ -58,5 +59,4 @@ defmodule EventPlanningWeb.TableControllerTest do
       assert redirected_to(conn) == Routes.table_path(conn, :my_schedule)
     end
   end
-
 end
