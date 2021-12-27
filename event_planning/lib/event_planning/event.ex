@@ -19,8 +19,7 @@ defmodule EventPlanning.Event do
       "week",
       "month",
       "year",
-      "none",
-      nil
+      "none"
     ])
   end
 end

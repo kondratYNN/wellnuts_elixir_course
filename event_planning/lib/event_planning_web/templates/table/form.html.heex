@@ -7,5 +7,13 @@
   <%= text_input f, :repetition, id: "repetition" %>
   <%= error_tag f, :repetition %>
 
-  <%= submit "Save", id: "update"%>
+  <%= if @action != "/event" do %>
+    <%= hidden_input f, :id %>
+  <% end %>
+
+   <%= if @action == "/event" do %>
+      <%= submit "Save", id: "add_btt"%>
+    <% else %>
+      <%= submit "Save", id: "update"%>
+    <% end %>
 <% end %>

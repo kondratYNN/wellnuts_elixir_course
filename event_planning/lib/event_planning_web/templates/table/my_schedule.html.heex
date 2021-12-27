@@ -27,19 +27,14 @@
     <%= for event <- @nonconflicting_events do %>
     <%= content_tag :tr, id: event.id do %>
       <td><%= event.date %></td>
-      <%= if event.repetition != nil do%>
-        <td><%= event.repetition %></td>
-      <%= else %>
-        <td>No repetition</td>
-      <% end %>
+      <td><%= event.repetition %></td>
       <td>
         <span><%= link "Show", to: Routes.table_path(@conn, :show, event), id: "show" <> Integer.to_string(event.id)%></span>
       </td>
 
     <% end %>
-  
-
-<% end %>
+    <% end %>
+    <tr id="event"></tr>
   </tbody>
 </table>
 

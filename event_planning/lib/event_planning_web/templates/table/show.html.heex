@@ -2,7 +2,10 @@
 <span><%= link "Schedule", to: Routes.table_path(@conn, :my_schedule) %></span>
 <p></p>
 <h3> Start date: <%= @event.date %></h3>
-<h3> Repetition: <%= @event.repetition %></h3>  
+<h3> Repetition: <%= @event.repetition %></h3>    
+<%= content_tag :p, hidden: true, id: "id_event" do %>
+  <%= @event.id %>
+<% end %>
 <p></p>
 <span><%= link "Edit", to: Routes.table_path(@conn, :edit, @event) %></span>
 <span>or</span>
