@@ -21,7 +21,7 @@ defmodule EventPlanningWeb.TableController do
     q = Ecto.Query.from(e in Event)
 
     Repo.all(q)
-    |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
+    |> Enum.reject(fn x -> x.repetition == "none" and x.date > DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
       %{
         x
@@ -162,9 +162,9 @@ defmodule EventPlanningWeb.TableController do
   end
 
   def create(conn, %{"event" => event_params}) do
-    %Event{}
-    |> Event.changeset(event_params)
-    |> Repo.insert()
+    # %Event{}
+    # |> Event.changeset(event_params)
+    # |> Repo.insert()
 
     conn
     |> redirect(to: Routes.table_path(conn, :my_schedule))

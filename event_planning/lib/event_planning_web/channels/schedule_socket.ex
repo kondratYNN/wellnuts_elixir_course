@@ -1,7 +1,7 @@
 defmodule EventPlanningWeb.ScheduleSocket do
   use Phoenix.Socket
 
-  channel "changes:*", EventPlanningWeb.ChangesChannel
+  channel "changes:lobby", EventPlanningWeb.ChangesChannel
 
   @impl true
   def connect(_params, socket, _connect_info) do
