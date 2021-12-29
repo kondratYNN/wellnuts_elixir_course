@@ -15,5 +15,6 @@
       <%= submit "Save", id: "add_btt"%>
     <% else %>
       <%= submit "Save", id: "update"%>
+      <%= hidden_input f, :id %>
     <% end %>
 <% end %>

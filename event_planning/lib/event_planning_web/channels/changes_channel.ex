@@ -5,7 +5,7 @@ defmodule EventPlanningWeb.ChangesChannel do
   alias EventPlanning.Repo
   alias EventPlanning.Event
 
-  intercept(["create"])
+  intercept(["create", "update"])
 
   @impl true
   def join("changes:lobby", _payload, socket) do
@@ -37,11 +37,28 @@ defmodule EventPlanningWeb.ChangesChannel do
     {:noreply, socket}
   end
 
-  # def handle_in("update", %{"body" => body}, socket) do
-  # end
+  @impl true
+  def handle_in("update", %{"data" => data}, socket) do
+    # require IEx; IEx.pry
+    # %{
+    #   "date" => date,
+    #   "repetition" => repetition,
+    # } = body
+    # event = %{date: date, repetition: repetition}
+    # changeset = Event.changeset(%Event{}, event)
+    # {:ok, event} = Repo.insert(changeset)
+    event = Repo.get(Event, data["id"])
+    |> Event.changeset(%{date: parse_date(data), repetition: data["repetition"]})
+    |> Repo.update!()
 
-  # def handle_in("delete", %{"body" => body}, socket) do
-  # end
+    broadcast(socket, "update", %{id: event.id})
+    {:noreply, socket}
+  end
+
+  def handle_in("delete", %{"data" => id}, socket) do
+    broadcast(socket, "delete", %{id: id})
+    {:noreply, socket}
+  end
 
   @impl true
   def handle_out("create", msg, socket) do
@@ -67,13 +84,30 @@ defmodule EventPlanningWeb.ChangesChannel do
     {:noreply, socket}
   end
 
-  # def handle_out("update_e", msg, socket) do
-  #   {:noreply, socket}
-  # end
+  @impl true
+  def handle_out("update", msg, socket) do
+    push(
+      socket,
+      "update",
+      Map.merge(
+        msg,
+        %{html_event: generate_html(Repo.get(Event, msg.id))}
+      )
+    )
 
-  # def handle_out("delete_e", msg, socket) do
-  #   {:noreply, socket}
-  # end
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_out("delete", msg, socket) do
+    push(
+      socket,
+      "delete",
+      msg
+    )
+
+    {:noreply, socket}
+  end
 
   def generate_html(event) do
     ~E"""
