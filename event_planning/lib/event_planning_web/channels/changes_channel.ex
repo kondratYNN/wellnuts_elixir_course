@@ -30,7 +30,7 @@ defmodule EventPlanningWeb.ChangesChannel do
     # {:ok, event} = Repo.insert(changeset)
     event =
       %Event{}
-      |> Event.changeset(%{date: parse_date(data), repetition: data["repetition"]})
+      |> Event.changeset(%{name: data["name"], date: parse_date(data), repetition: data["repetition"]})
       |> Repo.insert!()
 
     broadcast(socket, "create", %{id: event.id})
@@ -48,7 +48,7 @@ defmodule EventPlanningWeb.ChangesChannel do
     # changeset = Event.changeset(%Event{}, event)
     # {:ok, event} = Repo.insert(changeset)
     event = Repo.get(Event, data["id"])
-    |> Event.changeset(%{date: parse_date(data), repetition: data["repetition"]})
+    |> Event.changeset(%{name: data["name"], date: parse_date(data), repetition: data["repetition"]})
     |> Repo.update!()
 
     broadcast(socket, "update", %{id: event.id})
@@ -111,6 +111,7 @@ defmodule EventPlanningWeb.ChangesChannel do
 
   def generate_html(event) do
     ~E"""
+    <td><%= event.name %></td>
     <td><%= event.date %></td>
     <td><%= event.repetition %></td>
     <td>

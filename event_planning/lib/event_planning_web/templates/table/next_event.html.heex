@@ -4,7 +4,7 @@
 <%= if @event == [] do %>
     <p>No events in the future</p>
 <% else %>
-    <p>Closest: <%= @event.date %></p>
+    <p>Closest: <%= @event.name %> - <%= @event.date %></p>
     <span> <%= day = trunc(@time / 86400) %>d</span>
     <span> <%= hour = trunc((@time - day * 86400) / 3600) %>h</span>
     <span> <%= minute = trunc((@time - (day * 86400) - (hour * 3600)) / 60) %>m</span>
