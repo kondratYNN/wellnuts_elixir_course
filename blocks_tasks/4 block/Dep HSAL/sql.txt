@@ -1,0 +1,8 @@
+SELECT Dep.Name AS Department, 
+       Emp.Name AS Employee, 
+       Emp.Salary AS Salary 
+FROM Department AS Dep, 
+     Employee AS Emp, 
+     (SELECT MAX(Salary) AS Salary, DepartmentID FROM Employee GROUP BY DepartmentID) AS MaxT 
+WHERE Dep.Id = MaxT.DepartmentID AND Dep.Id = Emp.DepartmentID AND Emp.Salary = MaxT.Salary 
+
