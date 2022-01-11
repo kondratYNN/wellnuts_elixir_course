@@ -20,14 +20,6 @@ defmodule EventPlanningWeb.ChangesChannel do
 
   @impl true
   def handle_in("create", %{"data" => data}, socket) do
-    # require IEx; IEx.pry
-    # %{
-    #   "date" => date,
-    #   "repetition" => repetition,
-    # } = body
-    # event = %{date: date, repetition: repetition}
-    # changeset = Event.changeset(%Event{}, event)
-    # {:ok, event} = Repo.insert(changeset)
     event =
       %Event{}
       |> Event.changeset(%{name: data["name"], date: parse_date(data), repetition: data["repetition"]})
@@ -39,14 +31,6 @@ defmodule EventPlanningWeb.ChangesChannel do
 
   @impl true
   def handle_in("update", %{"data" => data}, socket) do
-    # require IEx; IEx.pry
-    # %{
-    #   "date" => date,
-    #   "repetition" => repetition,
-    # } = body
-    # event = %{date: date, repetition: repetition}
-    # changeset = Event.changeset(%Event{}, event)
-    # {:ok, event} = Repo.insert(changeset)
     event = Repo.get(Event, data["id"])
     |> Event.changeset(%{name: data["name"], date: parse_date(data), repetition: data["repetition"]})
     |> Repo.update!()
@@ -62,16 +46,6 @@ defmodule EventPlanningWeb.ChangesChannel do
 
   @impl true
   def handle_out("create", msg, socket) do
-    # require IEx; IEx.pry
-    # push(
-    #   socket,
-    #   "add",
-    #   Map.merge(
-    #     msg,
-    #     %{html_event: generate_html(Repo.get(Event, msg.id))}
-    #   )
-    # )
-    require IEx; IEx.pry
     push(
       socket,
       "create",
@@ -130,23 +104,6 @@ defmodule EventPlanningWeb.ChangesChannel do
       ),
       Time.new!(String.to_integer(hour), String.to_integer(minute), 0, 0)
     )
-    # %DateTime{
-    #   year: string_to_integer(year),
-    #   month: string_to_integer(month),
-    #   day: string_to_integer(day),
-    #   hour: string_to_integer(hour),
-    #   minute: string_to_integer(minute),
-    #   zone_abbr: "UTC",
-    #   second: 1,
-    #   microsecond: {0, 0},
-    #   utc_offset: 0,
-    #   std_offset: 0,
-    #   time_zone: "Etc/UTC"
-    # }
   end
 
-  # defp string_to_integer(string) do
-  #   {integer, ""} = Integer.parse(string)
-  #   integer
-  # end
 end

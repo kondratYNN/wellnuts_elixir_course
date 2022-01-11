@@ -13,6 +13,10 @@ defmodule EventPlanningWeb.TableController do
     render_my_schedule(conn, categories_id)
   end
 
+  def my_schedule(conn, %{"file" => file}) do
+    render_my_schedule(conn, "week", file.path)
+  end
+
   def my_schedule(conn, _params) do
     render_my_schedule(conn, "week")
   end
@@ -35,6 +39,55 @@ defmodule EventPlanningWeb.TableController do
             )
       }
     end)
+  end
+
+  defp is_valid_file(data) do
+    result =
+      Enum.reduce(data, 0, fn x, acc ->
+        if x.dtstart != nil and x.description != nil do
+          acc
+        else
+          acc + 1
+        end
+      end)
+
+    if result == 0 do
+      true
+    else
+      false
+    end
+  end
+
+  def render_my_schedule(conn, categories_id, filepath) do
+    categories = ["week", "month", "year"]
+    file = ICalendar.from_ics(File.read!(filepath))
+
+    if is_valid_file(file) do
+      Enum.each(file, fn x ->
+        event = %{
+          "name" => x.summary,
+          "date" => x.dtstart,
+          "repetition" => x.description
+        }
+
+        %Event{}
+        |> Event.changeset(event)
+        |> Repo.insert()
+      end)
+    end
+
+    event = filter_events()
+    event = date_boundaries(event, categories_id)
+
+    nonc_events = nonconflicting_events(event)
+    c_events = conflicting_events(event)
+
+    render(conn, "my_schedule.html",
+      events: event,
+      conflicting_events: c_events,
+      nonconflicting_events: nonc_events,
+      categories: categories
+    )
   end
 
   def render_my_schedule(conn, categories_id) do
@@ -141,7 +194,8 @@ defmodule EventPlanningWeb.TableController do
     # event = Repo.get(Event, id)
 
     conn
-      |> redirect(to: Routes.table_path(conn, :my_schedule))
+    |> redirect(to: Routes.table_path(conn, :my_schedule))
+
     # case update_event(event, event_params) do
     #   {:ok, _event} ->
     #     conn
