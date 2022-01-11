@@ -2,8 +2,10 @@
 <table>
   <thead>
     <tr>
+      <th>Name</th>
       <th>Date</th>
       <th>Repetition</th>
+      <th>Item</th>
     </tr>
   </thead>
   <tbody id="table">
@@ -15,6 +17,7 @@
   <% end %>
   <%= for event <- @conflicting_events do %>
     <%= content_tag :tr, id: event.id do %>
+      <td><font color="#D1010B"><%= event.name %></font></td>
       <td><font color="#D1010B"><%= event.date %></font></td>
       <td><font color="#D1010B"><%= event.repetition %></font></td>
       <td>
@@ -26,6 +29,7 @@
 
     <%= for event <- @nonconflicting_events do %>
     <%= content_tag :tr, id: event.id do %>
+      <td><%= event.name %></td>
       <td><%= event.date %></td>
       <td><%= event.repetition %></td>
       <td>
