@@ -21,7 +21,7 @@ defmodule EventPlanningWeb.TableController do
     q = Ecto.Query.from(e in Event)
 
     Repo.all(q)
-    |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
+    |> Enum.reject(fn x -> x.repetition == "none" and x.date > DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
       %{
         x
@@ -138,16 +138,18 @@ defmodule EventPlanningWeb.TableController do
   end
 
   def update(conn, %{"id" => id, "event" => event_params}) do
-    event = Repo.get(Event, id)
+    # event = Repo.get(Event, id)
 
-    case update_event(event, event_params) do
-      {:ok, _event} ->
-        conn
-        |> redirect(to: Routes.table_path(conn, :my_schedule))
+    conn
+      |> redirect(to: Routes.table_path(conn, :my_schedule))
+    # case update_event(event, event_params) do
+    #   {:ok, _event} ->
+    #     conn
+    #     |> redirect(to: Routes.table_path(conn, :my_schedule))
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", event: event, changeset: changeset)
-    end
+    #   {:error, %Ecto.Changeset{} = changeset} ->
+    #     render(conn, "edit.html", event: event, changeset: changeset)
+    # end
   end
 
   def delete(conn, %{"id" => id}) do
@@ -162,9 +164,9 @@ defmodule EventPlanningWeb.TableController do
   end
 
   def create(conn, %{"event" => event_params}) do
-    %Event{}
-    |> Event.changeset(event_params)
-    |> Repo.insert()
+    # %Event{}
+    # |> Event.changeset(event_params)
+    # |> Repo.insert()
 
     conn
     |> redirect(to: Routes.table_path(conn, :my_schedule))

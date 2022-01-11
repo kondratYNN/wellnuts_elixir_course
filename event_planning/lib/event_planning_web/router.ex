@@ -17,7 +17,6 @@ defmodule EventPlanningWeb.Router do
   scope "/", EventPlanningWeb do
     pipe_through(:browser)
 
-    #get "/", PageController, :index
     get "/account", AccountController, :index
     resources "/event", TableController, except: [:index]
     get "/my_schedule", TableController, :my_schedule
