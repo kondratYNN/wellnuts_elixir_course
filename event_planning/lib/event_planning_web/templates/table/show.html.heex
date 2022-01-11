@@ -1,0 +1,9 @@
+<h1>Show Event</h1>
+<span><%= link "Schedule", to: Routes.table_path(@conn, :my_schedule) %></span>
+<p></p>
+<h3> Start date: <%= @event.date %></h3>
+<h3> Repetition: <%= @event.repetition %></h3>  
+<p></p>
+<span><%= link "Edit", to: Routes.table_path(@conn, :edit, @event) %></span>
+<span>or</span>
+<span><%= link "Delete", to: Routes.table_path(@conn, :delete, @event), method: :delete, id: "delete" %></span>

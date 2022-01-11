@@ -1,0 +1,11 @@
+<%= form_for @changeset, @action, [id: "event-from"], fn f -> %>
+  <%= label f, :date %>
+  <%= datetime_select f, :date, id: "date" %>
+  <%= error_tag f, :date %>
+
+  <%= label f, :repetition %>
+  <%= text_input f, :repetition, id: "repetition" %>
+  <%= error_tag f, :repetition %>
+
+  <%= submit "Save", id: "update"%>
+<% end %>
