@@ -42,53 +42,22 @@ defmodule EventPlanningWeb.TableController do
     end)
   end
 
-  # defp is_valid_file(data) do
-  #   result =
-  #     Enum.reduce(data, 0, fn x, acc ->
-  #       if x.dtstart != nil and x.description != nil do
-  #         acc
-  #       else
-  #         acc + 1
-  #       end
-  #     end)
-
-  #   if result == 0 do
-  #     true
-  #   else
-  #     false
-  #   end
-  # end
-
   def render_my_schedule(conn, categories_id, filepath) do
     categories = ["week", "month", "year"]
     file = ICalendar.from_ics(File.read!(filepath))
 
-    # if is_valid_file(file) do
-      Enum.reduce(file, Multi.new(), fn x, acc ->
-        event = %{
-          "name" => x.summary,
-          "date" => x.dtstart,
-          "repetition" => x.description
-        }
+    Enum.reduce(file, Multi.new(), fn x, acc ->
+      event = %{
+        "name" => x.summary,
+        "date" => x.dtstart,
+        "repetition" => x.description
+      }
 
-        changeset = Event.changeset(%Event{}, event)
+      changeset = Event.changeset(%Event{}, event)
 
-        Ecto.Multi.insert(acc, {:insert, x.summary}, changeset)
-      end)
-      |> Repo.transaction()
-
-      # Enum.each(file, fn x ->
-      #   event = %{
-      #     "name" => x.summary,
-      #     "date" => x.dtstart,
-      #     "repetition" => x.description
-      #   }
-
-      #   %Event{}
-      #   |> Event.changeset(event)
-      #   |> Repo.insert()
-      # end)
-    # end
+      Ecto.Multi.insert(acc, {:insert, x.summary}, changeset)
+    end)
+    |> Repo.transaction()
 
     event = filter_events()
     event = date_boundaries(event, categories_id)
@@ -204,20 +173,8 @@ defmodule EventPlanningWeb.TableController do
     |> Repo.update()
   end
 
-  def update(conn, %{"id" => _id, "event" => _event_params}) do
-    # event = Repo.get(Event, id)
-
-    conn
-    |> redirect(to: Routes.table_path(conn, :my_schedule))
-
-    # case update_event(event, event_params) do
-    #   {:ok, _event} ->
-    #     conn
-    #     |> redirect(to: Routes.table_path(conn, :my_schedule))
-
-    #   {:error, %Ecto.Changeset{} = changeset} ->
-    #     render(conn, "edit.html", event: event, changeset: changeset)
-    # end
+  def update(conn, _params) do
+    redirect(conn, to: Routes.table_path(conn, :my_schedule))
   end
 
   def delete(conn, %{"id" => id}) do
@@ -231,13 +188,8 @@ defmodule EventPlanningWeb.TableController do
     |> redirect(to: Routes.table_path(conn, :my_schedule))
   end
 
-  def create(conn, %{"event" => _event_params}) do
-    # %Event{}
-    # |> Event.changeset(event_params)
-    # |> Repo.insert()
-
-    conn
-    |> redirect(to: Routes.table_path(conn, :my_schedule))
+  def create(conn, _params) do
+    redirect(conn, to: Routes.table_path(conn, :my_schedule))
   end
 
   def new(conn, params) do
