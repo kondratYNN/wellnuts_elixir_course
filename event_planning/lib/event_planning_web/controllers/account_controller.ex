@@ -9,17 +9,19 @@ defmodule EventPlanningWeb.AccountController do
   @password "12345"
 
   def index(conn, _params) do
-    # changeset = User.changeset(%User{}, %{
-    #   email: "user@user.com",
-    #   role: "user"
-    # })
-    # Repo.insert(changeset)
+    changeset = User.changeset(%User{}, %{
+      email: "user@user.com",
+      role: "user"
+    })
+    Repo.insert(changeset)
     render(conn, "index.html")
   end
 
   defp check_login(email, password) do
     if password == @password do
       query = from(u in User, where: u.email == ^email)
+      require IEx
+      IEx.pry()
 
       case Repo.one(query) do
         %User{} = user -> {:ok, user}

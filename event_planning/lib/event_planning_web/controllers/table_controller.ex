@@ -15,6 +15,7 @@ defmodule EventPlanningWeb.TableController do
   @year_sec 31_536_000
 
   defp assign_user(conn, _params) do
+    require IEx; IEx.pry
     %{"user_id" => user_id} = conn.params
     case Repo.get(User, user_id) do
       nil -> redirect(conn, to: Routes.account_path(conn, :index))
@@ -168,7 +169,7 @@ defmodule EventPlanningWeb.TableController do
 
   def show(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
-    if Ability.can?(event, :read, get_session(conn, :user_id)) do
+    if Ability.can?(event, :read, conn.assigns[:user]) do
       render(conn, "show.html", event: event)
     else
       redirect(conn, to: Routes.account_path(conn, :index))
@@ -177,7 +178,7 @@ defmodule EventPlanningWeb.TableController do
 
   def edit(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
-    if Ability.can?(event, :read, get_session(conn, :user_id)) do
+    if Ability.can?(event, :update, conn.assigns[:user]) do
       changeset = Event.changeset(event, %{})
       render(conn, "edit.html", event: event, changeset: changeset)
     else
@@ -198,12 +199,8 @@ defmodule EventPlanningWeb.TableController do
   def delete(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
 
-    if Ability.can?(event, :read, get_session(conn, :user_id)) do
-      Repo.delete(event)
+      # Repo.delete(event)
       redirect(conn, to: Routes.user_table_path(conn, :my_schedule, conn.assigns[:user]))
-    else
-      redirect(conn, to: Routes.account_path(conn, :index))
-    end
   end
 
   def create(conn, _params) do

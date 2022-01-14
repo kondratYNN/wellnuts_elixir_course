@@ -7,6 +7,9 @@
 <%= content_tag :p, hidden: true, id: "id_event" do %>
   <%= @event.id %>
 <% end %>
+<%= content_tag :p, hidden: true, id: "user_id" do %>
+  <%= @user.id %>
+<% end %>
 <p></p>
 <span><%= link "Edit", to: Routes.user_table_path(@conn, :edit, @user, @event) %></span>
 <span>or</span>

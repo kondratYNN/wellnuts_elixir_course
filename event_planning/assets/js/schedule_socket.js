@@ -53,7 +53,8 @@ channel.on('update', (msg) => {
 if (delete_event != null) {
     delete_event.addEventListener('click', function(event) {
         let id = document.querySelector('#id_event').textContent
-        channel.push('delete', { data: id })
+        let user_id = document.getElementById('user_id').textContent
+        channel.push('delete', { data: { id, user_id } })
     })
 }
 

@@ -50,8 +50,13 @@ defmodule EventPlanningWeb.ChangesChannel do
     {:noreply, socket}
   end
 
-  def handle_in("delete", %{"data" => id}, socket) do
-    broadcast(socket, "delete", %{id: id})
+  def handle_in("delete", %{"data" => data}, socket) do
+    user = Repo.get(User, (String.replace(data["user_id"], ~r/[^0-9]/, "")))
+    event = Repo.get(Event, String.replace(data["id"], ~r/[^0-9]/, ""))
+    if Ability.can?(event, :read, user) do
+      Repo.delete(event)
+      broadcast(socket, "delete", %{id: data["id"]})
+    end
     {:noreply, socket}
   end
 
