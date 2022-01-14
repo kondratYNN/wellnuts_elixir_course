@@ -45,3 +45,14 @@
 
 <p><%= link "New Event", to: Routes.table_path(@conn, :new) %></p>
 <p><%= link "Next Event", to: Routes.table_path(@conn, :next_event) %></p>
+
+<%= form_for @conn, "my_schedule", [multipart: true], fn f -> %>
+  <div class="form-group">
+    <label>ICS file</label>
+    <%= file_input f, :file, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= submit "Upload", class: "btn btn-primary" %>
+  </div>
+<% end %>
