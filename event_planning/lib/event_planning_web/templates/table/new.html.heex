@@ -1,6 +1,6 @@
 <h1>New Event</h1>
 
-<span><%= link "Back", to: Routes.table_path(@conn, :my_schedule) %></span>
+<span><%= link "Back", to: Routes.user_table_path(@conn, :my_schedule, @user) %></span>
 
-<%= render "form.html", Map.put(assigns, :action, Routes.table_path(@conn, :create)) %>
+<%= render "form.html", Map.put(assigns, :action, Routes.user_table_path(@conn, :create, @user)) %>
 

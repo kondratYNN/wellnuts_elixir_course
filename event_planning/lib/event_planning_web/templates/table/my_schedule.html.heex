@@ -9,7 +9,7 @@
     </tr>
   </thead>
   <tbody id="table">
-  <%= form_for @conn, Routes.table_path(@conn, :my_schedule), [as: :page, class: "form-signin"], fn f -> %>
+  <%= form_for @conn, Routes.user_table_path(@conn, :my_schedule, @user), [as: :page, class: "form-signin"], fn f -> %>
     <div>
       <%= select f, :categories_id, @categories %>
     </div>
@@ -21,7 +21,7 @@
       <td><font color="#D1010B"><%= event.date %></font></td>
       <td><font color="#D1010B"><%= event.repetition %></font></td>
       <td>
-        <span><%= link "Show", to: Routes.table_path(@conn, :show, event), id: "show" <> Integer.to_string(event.id)%></span>
+        <span><%= link "Show", to: Routes.user_table_path(@conn, :show, @user, event), id: "show" <> Integer.to_string(event.id)%></span>
       </td>
 
     <% end %>
@@ -33,7 +33,7 @@
       <td><%= event.date %></td>
       <td><%= event.repetition %></td>
       <td>
-        <span><%= link "Show", to: Routes.table_path(@conn, :show, event), id: "show" <> Integer.to_string(event.id)%></span>
+        <span><%= link "Show", to: Routes.user_table_path(@conn, :show, @user, event), id: "show" <> Integer.to_string(event.id)%></span>
       </td>
 
     <% end %>
@@ -43,8 +43,8 @@
 </table>
 
 
-<p><%= link "New Event", to: Routes.table_path(@conn, :new) %></p>
-<p><%= link "Next Event", to: Routes.table_path(@conn, :next_event) %></p>
+<p><%= link "New Event", to: Routes.user_table_path(@conn, :new, @user) %></p>
+<p><%= link "Next Event", to: Routes.user_table_path(@conn, :next_event, @user) %></p>
 
 <%= form_for @conn, "my_schedule", [multipart: true], fn f -> %>
   <div class="form-group">

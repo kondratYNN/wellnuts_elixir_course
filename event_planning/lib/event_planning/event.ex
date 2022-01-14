@@ -7,6 +7,7 @@ defmodule EventPlanning.Event do
     field :name, :string
     field :date, :utc_datetime
     field :repetition, :string
+    belongs_to :user, EventPlanning.User
 
     timestamps()
   end

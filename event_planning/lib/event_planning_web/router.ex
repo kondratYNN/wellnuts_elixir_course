@@ -17,11 +17,14 @@ defmodule EventPlanningWeb.Router do
   scope "/", EventPlanningWeb do
     pipe_through(:browser)
 
-    get "/account", AccountController, :index
-    resources "/event", TableController, except: [:index]
-    get "/my_schedule", TableController, :my_schedule
-    post "/my_schedule", TableController, :my_schedule
-    get "/next_event", TableController, :next_event
+    resources "/account", AccountController, only: [:index, :create]
+
+    resources "/user", UserController do
+      resources "/event", TableController, except: [:index]
+      get "/my_schedule", TableController, :my_schedule
+      post "/my_schedule", TableController, :my_schedule
+      get "/next_event", TableController, :next_event
+    end
   end
 
   # Other scopes may use custom stacks.

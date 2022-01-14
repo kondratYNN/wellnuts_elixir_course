@@ -16,6 +16,7 @@ let delete_event = document.getElementById('delete');
 
 if (create_event != null) {
     create_event.addEventListener('click', function(event) {
+        let user_id = document.getElementById('user_id').textContent
         let { value: name } = document.querySelector('#name')
         let { value: repetition } = document.querySelector('#repetition')
         let { value: date_year } = document.querySelector('#date_year')
@@ -23,7 +24,7 @@ if (create_event != null) {
         let { value: date_day } = document.querySelector('#date_day')
         let { value: date_hour } = document.querySelector('#date_hour')
         let { value: date_minute } = document.querySelector('#date_minute')
-        channel.push('create', { data: { name, repetition, date_year, date_month, date_day, date_hour, date_minute } })
+        channel.push('create', { data: { user_id, name, repetition, date_year, date_month, date_day, date_hour, date_minute } })
     })
 }
 
@@ -46,8 +47,6 @@ if (update_event != null) {
 }
 
 channel.on('update', (msg) => {
-    // document.getElementById(msg.id).style.display = "none"
-    // document.querySelector("#event").innerHTML += msg.html_event
     document.getElementById(msg.id).innerHTML = msg.html_event
 })
 

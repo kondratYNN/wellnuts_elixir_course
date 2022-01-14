@@ -1,5 +1,5 @@
 <h1>Show Event</h1>
-<span><%= link "Schedule", to: Routes.table_path(@conn, :my_schedule) %></span>
+<span><%= link "Schedule", to: Routes.user_table_path(@conn, :my_schedule, @user) %></span>
 <p></p>
 <h3> Name: <%= @event.name %></h3>
 <h3> Start date: <%= @event.date %></h3>
@@ -8,6 +8,6 @@
   <%= @event.id %>
 <% end %>
 <p></p>
-<span><%= link "Edit", to: Routes.table_path(@conn, :edit, @event) %></span>
+<span><%= link "Edit", to: Routes.user_table_path(@conn, :edit, @user, @event) %></span>
 <span>or</span>
-<span><%= link "Delete", to: Routes.table_path(@conn, :delete, @event), method: :delete, id: "delete" %></span>
+<span><%= link "Delete", to: Routes.user_table_path(@conn, :delete, @user, @event), method: :delete, id: "delete" %></span>

@@ -1,25 +1,45 @@
 defmodule EventPlanningWeb.AccountController do
   use EventPlanningWeb, :controller
+  import Ecto.Query, only: [from: 2]
 
-  def index(conn, %{"fpasscode" => passcode}) do
-    if passcode == "12345" do
-      conn = put_session(conn, :message, "hmmm")
-      redirect(conn, to: "/account/my_sheldue")
-    else
-      render(conn, "index.html")
-    end
-  end
+  alias EventPlanning.User
+  alias EventPlanning.Repo
+
+  @session_msg "QWerTY123"
+  @password "12345"
 
   def index(conn, _params) do
+    # changeset = User.changeset(%User{}, %{
+    #   email: "user@user.com",
+    #   role: "user"
+    # })
+    # Repo.insert(changeset)
     render(conn, "index.html")
   end
 
-  def show(conn, _params) do
-    if get_session(conn, :message) == "hmmm" do
-      render(conn, "show.html")
+  defp check_login(email, password) do
+    if password == @password do
+      query = from(u in User, where: u.email == ^email)
+
+      case Repo.one(query) do
+        %User{} = user -> {:ok, user}
+        nil -> {:error, :unauthorized}
+      end
     else
-      conn
-      |> put_status(500)
+      {:error, :unauthorized}
+    end
+  end
+
+  def create(conn, %{"user" => %{"email" => email, "password" => password}}) do
+    case check_login(email, password) do
+      {:ok, user} ->
+        conn
+        |> put_session(:user_id, %{id: user.id})
+        |> put_session(:message, @session_msg)
+        |> redirect(to: Routes.user_table_path(conn, :my_schedule, user.id))
+
+      {:error, :unauthorized} ->
+        redirect(conn, to: Routes.account_path(conn, :index))
     end
   end
 end

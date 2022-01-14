@@ -2,8 +2,10 @@ defmodule EventPlanningWeb.ChangesChannel do
   use Phoenix.Channel
   import Phoenix.HTML
   import Phoenix.HTML.Link
+  import Ecto
   alias EventPlanning.Repo
   alias EventPlanning.Event
+  alias EventPlanning.User
 
   intercept(["create", "update"])
 
@@ -13,6 +15,11 @@ defmodule EventPlanningWeb.ChangesChannel do
     {:ok, socket}
   end
 
+  @impl true
+  def handle_info(:after_join, socket) do
+    {:noreply, socket}
+  end
+
   def handle_in("ping", payload, socket) do
     {:reply, {:ok, payload}, socket}
   end
@@ -20,10 +27,14 @@ defmodule EventPlanningWeb.ChangesChannel do
 
   @impl true
   def handle_in("create", %{"data" => data}, socket) do
-    event =
-      %Event{}
+    %{
+      "user_id" => user_id
+    } = data
+    {:ok, event} =
+      Repo.get(User, String.to_integer(String.replace(user_id, ~r/[^0-9]/, "")))
+      |> build_assoc(:event)
       |> Event.changeset(%{name: data["name"], date: parse_date(data), repetition: data["repetition"]})
-      |> Repo.insert!()
+      |> Repo.insert()
 
     broadcast(socket, "create", %{id: event.id})
     {:noreply, socket}

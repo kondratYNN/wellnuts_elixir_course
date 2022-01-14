@@ -1,14 +1,26 @@
 defmodule EventPlanningWeb.TableController do
   use EventPlanningWeb, :controller
   import Ecto.Query, only: [from: 2]
+  import Ecto
 
   alias Ecto.Multi
   alias EventPlanning.Repo
   alias EventPlanning.Event
+  alias EventPlanning.User
+
+  plug :assign_user
 
   @day_sec 86400
   @week_sec 604_800
   @year_sec 31_536_000
+
+  defp assign_user(conn, _params) do
+    %{"user_id" => user_id} = conn.params
+    case Repo.get(User, user_id) do
+      nil -> redirect(conn, to: Routes.account_path(conn, :index))
+      user -> assign(conn, :user, user)
+    end
+  end
 
   def my_schedule(conn, %{"page" => %{"categories_id" => categories_id}}) do
     render_my_schedule(conn, categories_id)
@@ -22,10 +34,8 @@ defmodule EventPlanningWeb.TableController do
     render_my_schedule(conn, "week")
   end
 
-  def filter_events() do
-    q = Ecto.Query.from(e in Event)
-
-    Repo.all(q)
+  def filter_events(events) do
+    events
     |> Enum.reject(fn x -> x.repetition == "none" and x.date > DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
       %{
@@ -42,55 +52,24 @@ defmodule EventPlanningWeb.TableController do
     end)
   end
 
-  # defp is_valid_file(data) do
-  #   result =
-  #     Enum.reduce(data, 0, fn x, acc ->
-  #       if x.dtstart != nil and x.description != nil do
-  #         acc
-  #       else
-  #         acc + 1
-  #       end
-  #     end)
-
-  #   if result == 0 do
-  #     true
-  #   else
-  #     false
-  #   end
-  # end
-
   def render_my_schedule(conn, categories_id, filepath) do
     categories = ["week", "month", "year"]
     file = ICalendar.from_ics(File.read!(filepath))
 
-    # if is_valid_file(file) do
-      Enum.reduce(file, Multi.new(), fn x, acc ->
-        event = %{
-          "name" => x.summary,
-          "date" => x.dtstart,
-          "repetition" => x.description
-        }
+    Enum.reduce(file, Multi.new(), fn x, acc ->
+      event = %{
+        "name" => x.summary,
+        "date" => x.dtstart,
+        "repetition" => x.description
+      }
 
-        changeset = Event.changeset(%Event{}, event)
+      changeset = Event.changeset(%Event{}, event)
 
-        Ecto.Multi.insert(acc, {:insert, x.summary}, changeset)
-      end)
-      |> Repo.transaction()
+      Ecto.Multi.insert(acc, {:insert, x.summary}, changeset)
+    end)
+    |> Repo.transaction()
 
-      # Enum.each(file, fn x ->
-      #   event = %{
-      #     "name" => x.summary,
-      #     "date" => x.dtstart,
-      #     "repetition" => x.description
-      #   }
-
-      #   %Event{}
-      #   |> Event.changeset(event)
-      #   |> Repo.insert()
-      # end)
-    # end
-
-    event = filter_events()
+    event = filter_events(Repo.all(assoc(conn.assigns[:user], :event)))
     event = date_boundaries(event, categories_id)
 
     nonc_events = nonconflicting_events(event)
@@ -107,7 +86,7 @@ defmodule EventPlanningWeb.TableController do
   def render_my_schedule(conn, categories_id) do
     categories = ["week", "month", "year"]
 
-    event = filter_events()
+    event = filter_events(Repo.all(assoc(conn.assigns[:user], :event)))
     event = date_boundaries(event, categories_id)
 
     nonc_events = nonconflicting_events(event)
@@ -189,13 +168,21 @@ defmodule EventPlanningWeb.TableController do
 
   def show(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
-    render(conn, "show.html", event: event)
+    if Ability.can?(event, :read, get_session(conn, :user_id)) do
+      render(conn, "show.html", event: event)
+    else
+      redirect(conn, to: Routes.account_path(conn, :index))
+    end
   end
 
   def edit(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
-    changeset = Event.changeset(event, %{})
-    render(conn, "edit.html", event: event, changeset: changeset)
+    if Ability.can?(event, :read, get_session(conn, :user_id)) do
+      changeset = Event.changeset(event, %{})
+      render(conn, "edit.html", event: event, changeset: changeset)
+    else
+      redirect(conn, to: Routes.account_path(conn, :index))
+    end
   end
 
   def update_event(%Event{} = event, att) do
@@ -204,44 +191,31 @@ defmodule EventPlanningWeb.TableController do
     |> Repo.update()
   end
 
-  def update(conn, %{"id" => _id, "event" => _event_params}) do
-    # event = Repo.get(Event, id)
-
-    conn
-    |> redirect(to: Routes.table_path(conn, :my_schedule))
-
-    # case update_event(event, event_params) do
-    #   {:ok, _event} ->
-    #     conn
-    #     |> redirect(to: Routes.table_path(conn, :my_schedule))
-
-    #   {:error, %Ecto.Changeset{} = changeset} ->
-    #     render(conn, "edit.html", event: event, changeset: changeset)
-    # end
+  def update(conn, _params) do
+    redirect(conn, to: Routes.user_table_path(conn, :my_schedule, conn.assigns[:user]))
   end
 
   def delete(conn, %{"id" => id}) do
     event = Repo.get(Event, id)
 
-    if event do
-      {:ok, _event} = Repo.delete(event)
+    if Ability.can?(event, :read, get_session(conn, :user_id)) do
+      Repo.delete(event)
+      redirect(conn, to: Routes.user_table_path(conn, :my_schedule, conn.assigns[:user]))
+    else
+      redirect(conn, to: Routes.account_path(conn, :index))
     end
-
-    conn
-    |> redirect(to: Routes.table_path(conn, :my_schedule))
   end
 
-  def create(conn, %{"event" => _event_params}) do
-    # %Event{}
-    # |> Event.changeset(event_params)
-    # |> Repo.insert()
-
-    conn
-    |> redirect(to: Routes.table_path(conn, :my_schedule))
+  def create(conn, _params) do
+    redirect(conn, to: Routes.user_table_path(conn, :my_schedule, conn.assigns[:user]))
   end
 
   def new(conn, params) do
-    changeset = Event.changeset(%Event{}, params)
+    changeset =
+      conn.assigns[:user]
+      |> build_assoc(:event)
+      |> Event.changeset(params)
+
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -292,7 +266,7 @@ defmodule EventPlanningWeb.TableController do
   end
 
   def next_event(conn, _params) do
-    events = filter_events()
+    events = filter_events(Repo.all(assoc(conn.assigns[:user], :event)))
 
     if events == [] do
       render(conn, "next_event.html",
