@@ -15,7 +15,11 @@
     <%= hidden_input f, :id %>
   <% end %>
 
-   <%= if @action == "/event" do %>
+  <%= content_tag :p, hidden: true, id: "user_id" do %>
+    <%= @user.id %>
+  <% end %>
+
+   <%= if @action == "/user/" <> to_string(@user.id) <> "/event" do %>
       <%= submit "Save", id: "add_btt"%>
     <% else %>
       <%= submit "Save", id: "update"%>
